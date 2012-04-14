@@ -47,7 +47,7 @@ module OmniAuth
           @env['PATH_INFO'] = "#{OmniAuth.config.path_prefix}/#{name}/callback"
           call_app!
         else
-          fail!(:invalid_credentials, @auth_data)
+          fail!(user_data[:status])
         end
       end
 
@@ -61,7 +61,7 @@ module OmniAuth
           @env['PATH_INFO'] = "#{OmniAuth.config.path_prefix}/#{name}/callback"
           call_app!
         else
-          fail!(:invalid_credentials, @auth_data)
+          fail!(user_data[:status])
         end
       end
 
