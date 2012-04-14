@@ -38,7 +38,7 @@ module OmniAuth
       def perform_authentication
         debug 'perform_authentication'
         @auth_data = authenticate(request.params['phone'], request.params['personal_code'])
-        debug @auth_data.inspect
+        debug user_data.inspect
         
         if user_data[:status] == 'OK'
           @env['omniauth.auth'] = auth_hash
@@ -47,7 +47,7 @@ module OmniAuth
           @env['PATH_INFO'] = "#{OmniAuth.config.path_prefix}/#{name}/callback"
           call_app!
         else
-          fail!(user_data[:status])
+          fail!(failure_reason)
         end
       end
 
@@ -61,13 +61,20 @@ module OmniAuth
           @env['PATH_INFO'] = "#{OmniAuth.config.path_prefix}/#{name}/callback"
           call_app!
         else
-          fail!(user_data[:status])
+          fail!(failure_reason)
         end
       end
 
       def callback_phase
         debug "callback_phase"
-        fail!(:invalid_credentials)
+        fail!(failure_reason)
+      end
+      
+      def failure_reason
+        return :invalid_credentials if user_data.blank?
+        
+        code = (user_data[:faultstring] || user_data[:status]).try(:downcase)
+        "error_#{code || 'unknown'}"
       end
       
       def user_data
