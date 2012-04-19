@@ -110,6 +110,7 @@ module OmniAuth
           :language => options[:language],
           :country_code => options[:country_code],
           :message_to_display => options[:message_to_display],
+          :service_name => options[:service_name],
           :messaging_mode => options[:messaging_mode],
           :async_configuration => options[:async_configuration],
           :return_cert_data => false,
