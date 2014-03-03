@@ -8,7 +8,7 @@ module OmniAuth
 
       PhaseReadPin = 'read_pin'
       PhaseAuhtenticated = 'authenticated'
-      
+
       option :name, 'mobileid'
       option :service_name, 'Testimine'
       option :country_code, 'EE'
@@ -18,7 +18,7 @@ module OmniAuth
       option :async_configuration, 0
       option :endpoint_url, 'https://openxades.org:8443/DigiDocService'
       option :logger, nil
-      
+
       def request_phase
         perform
       end
@@ -30,7 +30,7 @@ module OmniAuth
           perform_authentication
         end
       end
-      
+
       def request_session_code
         request.params['session_code']
       end
@@ -39,7 +39,7 @@ module OmniAuth
         debug 'perform_authentication'
         @auth_data = authenticate(request.params['phone'], request.params['personal_code'])
         debug user_data.inspect
-        
+
         if user_data[:status] == 'OK'
           @env['omniauth.auth'] = auth_hash
           @env['omniauth.phase'] = PhaseReadPin
@@ -55,7 +55,9 @@ module OmniAuth
         debug 'get_authentication_status'
         @auth_data = authentication_status(request_session_code)
         debug @auth_data.inspect
+
         if ['USER_AUTHENTICATED', 'OUTSTANDING_TRANSACTION'].include?(user_data[:status])
+          @env['omniauth.auth'] = auth_hash
           @env['omniauth.phase'] = user_data[:status] == 'USER_AUTHENTICATED' ? PhaseAuhtenticated : PhaseReadPin
           @env['REQUEST_METHOD'] = 'GET'
           @env['PATH_INFO'] = "#{OmniAuth.config.path_prefix}/#{name}/callback"
@@ -69,18 +71,18 @@ module OmniAuth
         debug "callback_phase"
         fail!(failure_reason)
       end
-      
+
       def failure_reason
         return :invalid_credentials if user_data.blank?
-        
+
         code = (user_data[:faultstring] || user_data[:status]).try(:downcase)
         "error_#{code || 'unknown'}"
       end
-      
+
       def user_data
         @auth_data
       end
-      
+
       def auth_hash
         OmniAuth::Utils.deep_merge(super, {
           'uid' => user_data[:user_id_code],
@@ -116,7 +118,7 @@ module OmniAuth
           :return_cert_data => false,
           :return_revocation_data => false
         }
-        
+
         self.mobileid_client.authenticate(data)
       end
 
@@ -126,11 +128,11 @@ module OmniAuth
       end
 
       protected
-      
+
       def debug(message)
         options[:logger].debug("#{Time.now} #{message}") if options[:logger]
-      end      
-      
+      end
+
       def mobileid_client
         client = ::Digidoc::Client.new(options[:endpoint_url])
         client.respond_with_nested_struct = false
