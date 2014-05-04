@@ -57,7 +57,6 @@ module OmniAuth
         debug @auth_data.inspect
 
         if ['USER_AUTHENTICATED', 'OUTSTANDING_TRANSACTION'].include?(user_data[:status])
-          @env['omniauth.auth'] = auth_hash
           @env['omniauth.phase'] = user_data[:status] == 'USER_AUTHENTICATED' ? PhaseAuhtenticated : PhaseReadPin
           @env['REQUEST_METHOD'] = 'GET'
           @env['PATH_INFO'] = "#{OmniAuth.config.path_prefix}/#{name}/callback"
