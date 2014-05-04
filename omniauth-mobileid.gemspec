@@ -19,5 +19,5 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_dependency 'omniauth-oauth', '~> 1.0'
-  s.add_dependency 'digidoc_client', '~> 0.1'
+  s.add_dependency 'digidoc_client', '~> 0.2'
 end
